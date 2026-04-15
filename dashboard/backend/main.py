@@ -16,21 +16,24 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.loader import model_store
-from data.processor import (
-    load_raw_flights,
-    load_ground_stops,
-    load_ground_delays,
-    load_hourly_weather,
-    clean_flight_data,
-    generate_mock_predictions,
-    build_flight_cache,
-)
-from data.faa_live import fetch_faa_live_status
-from data.feature_lookup import load_feature_lookups, enrich_with_lookup
-from inference.predictor import Predictor
-
 PRODUCTION_MODE = os.getenv("PRODUCTION_MODE", "false").lower() == "true"
+
+from data.faa_live import fetch_faa_live_status
+
+if not PRODUCTION_MODE:
+    # Heavy ML imports — only loaded in development mode
+    from models.loader import model_store
+    from data.processor import (
+        load_raw_flights,
+        load_ground_stops,
+        load_ground_delays,
+        load_hourly_weather,
+        clean_flight_data,
+        generate_mock_predictions,
+        build_flight_cache,
+    )
+    from data.feature_lookup import load_feature_lookups, enrich_with_lookup
+    from inference.predictor import Predictor
 BACKEND_DIR = Path(__file__).resolve().parent
 PRODUCTION_DATA_DIR = BACKEND_DIR / "data" / "production"
 
