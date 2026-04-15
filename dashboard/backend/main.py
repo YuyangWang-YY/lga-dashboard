@@ -209,7 +209,11 @@ app = FastAPI(
 )
 
 # CORS for React frontend
-_cors_origins = ["http://localhost:5173", "http://localhost:3000"]
+_cors_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://lga-dashboard.vercel.app",
+]
 if _frontend_url := os.getenv("FRONTEND_URL"):
     _cors_origins.append(_frontend_url.rstrip("/"))
 
