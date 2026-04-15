@@ -6,7 +6,10 @@ import type {
   OperatingMode,
 } from "./types";
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "/api";
+const _viteApiUrl = import.meta.env.VITE_API_URL as string | undefined;
+const BASE_URL = _viteApiUrl
+  ? `${_viteApiUrl.replace(/\/+$/, "")}/api`
+  : "/api";
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url);
