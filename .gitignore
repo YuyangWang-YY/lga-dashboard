@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Node / React frontend
+node_modules/
+dashboard/frontend/dist/
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# CatBoost training artifacts
+catboost_info/
+
+# Large raw data & model files (NOT committed to git)
+data/raw/
+data/processed/
+models/*.joblib
+# Production parquet files (dashboard/backend/data/production/) ARE committed
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lga-backend
+    runtime: python
+    rootDir: dashboard/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PRODUCTION_MODE
+        value: "true"
+      - key: FRONTEND_URL
+        sync: false   # Set this in the Render dashboard after Vercel deployment
+    # Free tier: 512 MB RAM, spins down after 15 min of inactivity
