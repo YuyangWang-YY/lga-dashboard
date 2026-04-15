@@ -17,6 +17,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 PRODUCTION_MODE = os.getenv("PRODUCTION_MODE", "false").lower() == "true"
+BACKEND_DIR = Path(__file__).resolve().parent
+PRODUCTION_DATA_DIR = BACKEND_DIR / "data" / "production"
+
+# Columns the API actually reads from flight_cache — everything else is skipped
+# in production to keep memory well under Render's 512 MB free-tier limit.
+PRODUCTION_CACHE_COLUMNS = [
+    "flight_id", "Flight", "Direction", "Airline", "Remote_Airport",
+    "Gate", "Terminal", "Date", "Scheduled_Time", "Actual_Time", "Hour",
+    "Registration", "Body_Type", "Runway",
+    "risk_tier", "delay_probability",
+    "pred_delay_q50", "pred_delay_q10", "pred_delay_q90",
+    "confidence", "delay_cause",
+    "Delay_Minutes", "Is_Delayed",
+    "mock_origin_weather", "mock_origin_severity",
+    "mock_prev_aircraft_delay", "mock_turnaround", "mock_route_delay_rate",
+]
 
 from data.faa_live import fetch_faa_live_status
 
@@ -34,8 +50,6 @@ if not PRODUCTION_MODE:
     )
     from data.feature_lookup import load_feature_lookups, enrich_with_lookup
     from inference.predictor import Predictor
-BACKEND_DIR = Path(__file__).resolve().parent
-PRODUCTION_DATA_DIR = BACKEND_DIR / "data" / "production"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,9 +98,13 @@ async def lifespan(app: FastAPI):
     if PRODUCTION_MODE:
         # ── Production mode: load pre-computed parquet files (fast, ~3s) ──────
         logger.info("PRODUCTION MODE: loading pre-computed parquet files...")
-        app_state["flight_cache"] = pd.read_parquet(
-            PRODUCTION_DATA_DIR / "production_cache.parquet"
-        )
+        import pyarrow.parquet as pq
+        cache_path = PRODUCTION_DATA_DIR / "production_cache.parquet"
+        # Only read columns the API actually uses — skips 20+ ML feature columns
+        # and shap_factors, keeping memory well under Render's 512 MB free-tier limit.
+        existing_cols = set(pq.read_schema(cache_path).names)
+        cols_to_load = [c for c in PRODUCTION_CACHE_COLUMNS if c in existing_cols]
+        app_state["flight_cache"] = pd.read_parquet(cache_path, columns=cols_to_load)
         app_state["hourly_weather"] = pd.read_parquet(
             PRODUCTION_DATA_DIR / "production_weather.parquet"
         )
