@@ -252,6 +252,9 @@ Run the dashboard on your own machine for offline or development use.
 
 ## Project Structure
 
+https://github.com/YuyangWang-YY/LGA
+
+
 ```
 LGA/
 ├── start.bat                        # One-click Windows launcher
