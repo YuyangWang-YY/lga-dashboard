@@ -3,6 +3,13 @@
 A real-time predictive intelligence system for LaGuardia Airport (LGA) operations.  
 Built on historical flight data from January–October 2025, it enables AOC staff to identify high-risk flights before delays propagate across the network.
 
+### Option 1 — Web (No Installation Required)
+
+Access the hosted version directly in any browser:
+
+**URL:** [https://lga-dashboard.vercel.app/](https://lga-dashboard.vercel.app/)  
+**Password:** `LGA2025`
+
 ---
 
 ## Table of Contents
